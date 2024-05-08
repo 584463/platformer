@@ -9,17 +9,36 @@ class Player(pygame.sprite.Sprite):
         self.settings = game.settings
         self.color = "Blue"
         self.rect = pygame.Rect(0,0,10,30)
-        self.fall_count = 0
+        self.y_acc = 0
         self.falling = True
+        self.moving_left = self.moving_right = self.moving_up = False
     
     def draw(self):
         pygame.draw.rect(self.screen, self.color, self.rect)
         #Change to blit if you want to use an image
 
     def update(self):
-        self.rect.y += self.fall_count
-        self.rect.x = 10
+        self.rect.y += self.y_acc * .01
         if self.falling: 
-            self.fall_count += .01 
+            self.y_acc += 1
 
-        
+
+        self.move()
+
+
+    def landed(self):
+        self.falling = False
+        self.y_acc = 0
+
+
+    def move(self):
+        if self.moving_right:
+            self.rect.x += self.settings.player_speed
+        if self.moving_left:
+            self.rect.x -= self.settings.player_speed
+        if self.moving_up:
+            self.rect.y -= self.settings.player_up
+
+    def jump(self):
+        self.y_acc = -200
+        self.falling = True
