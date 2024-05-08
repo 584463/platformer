@@ -51,12 +51,15 @@ class Game:
     def _check_collisions(self):
         collisions = pygame.sprite.spritecollideany(self.player, self.map.map_objects)
         if collisions:
-            if self.player.y_acc > 0     and self.player.falling:
+            if self.player.y_acc > 0 and self.player.falling:
                 self.player.rect.bottom = collisions.rect.top
                 self.player.landed()
             elif self.player.y_acc < 0 and self.player.falling:
                 self.player.rect.top = collisions.rect.bottom
                 self.player.y_acc = 0
+
+            elif self.player.moving_right   and self.player.bottom  + 50 > collisions.rect.top:
+                self.player.rect.right = collisions.rect.left
 
         else:
             self.player.falling = True

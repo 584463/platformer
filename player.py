@@ -11,6 +11,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = pygame.Rect(0,0,10,30)
         self.y_acc = 0
         self.falling = True
+        self.jump_count = 0
         self.moving_left = self.moving_right = self.moving_up = False
     
     def draw(self):
@@ -29,6 +30,7 @@ class Player(pygame.sprite.Sprite):
     def landed(self):
         self.falling = False
         self.y_acc = 0
+        self.jump_count = 0
 
 
     def move(self):
@@ -40,5 +42,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.y -= self.settings.player_up
 
     def jump(self):
-        self.y_acc = -200
+        if self.jump_count == 0:
+            self.jump_count += 1
+            self.y_acc = -200
         self.falling = True

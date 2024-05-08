@@ -20,7 +20,7 @@ class Map:
         if level == 1:
             floor1 = Object(game, 0, 700, 400, 10)
             floor2 = Object(game, 500, 600, 400, 10)
-            block1 = Object(game, 900, 500, height=500)
+            block1 = Object(game, 900, 400, height=500)
             self.map_objects.add(floor1)
             self.map_objects.add(floor2)
             self.map_objects.add(block1)
