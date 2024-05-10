@@ -5,6 +5,7 @@ from player import Player
 
 class Game:
     def __init__(self):
+        self.clock = pygame.time.Clock()
         self.settings = Settings()
         self.screen = pygame.display.set_mode((1500,1000))
         pygame.display.set_caption("Platformer")
@@ -12,8 +13,6 @@ class Game:
         self._load_level()
         self.player = Player(self)
         self.running = True
-        self.clock = pygame.time.Clock ()
-        
 
     def run(self):
         while self.running:
@@ -24,12 +23,12 @@ class Game:
                     self.running = False
 
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_d:
+                    if event.key == pygame.K_RIGHT:
                         self.player.moving_right = True
 
                             
                             
-                    if event.key == pygame.K_a:
+                    if event.key == pygame.K_LEFT:
                         self.player.moving_left = True
 
 
@@ -37,9 +36,9 @@ class Game:
                         self.player.jump()
 
                 if event.type == pygame.KEYUP:
-                    if event.key == pygame.K_d:
+                    if event.key == pygame.K_RIGHT:
                         self.player.moving_right = False
-                    if event.key == pygame.K_a:
+                    if event.key == pygame.K_LEFT:
                         self.player.moving_left = False
 
             #Update
@@ -48,7 +47,7 @@ class Game:
             self.player.update()
             self._check_collisions()
             self.scroll()
- 
+
 
             #Draw Screen
             self.screen.fill(self.settings.bg_color)
@@ -80,21 +79,12 @@ class Game:
 
 
     def scroll(self):
-        self.left_limit = 0 
         if (self.player.rect.x >= self.screen.get_rect().right - self.settings.scroll_offset)\
         and self.player.moving_right:
-            self.player.rect.x -= self.settings.player_speed
+            self.player.rect.x -=self.settings.player_speed
             for object in self.map.map_objects:
                 object.rect.x -= self.settings.player_speed
-            self.left_limit  -= self.settings.player_speed
-        elif (self.player.rect.x <= self.screen.get_rect().left + self.settings.scroll_offset)\
-        and self.player.moving_left and self.player.rect.x < self.left_limit:
-            self.player.rect.x += self.settings.player_speed
-            for object in self.map.map_objects:
-                object.rect.x += self.settings.player_speed
-            self.left_limit  += self.settings.player_speed
-
-
+            
 
 game = Game()
 game.run()
