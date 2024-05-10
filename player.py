@@ -7,7 +7,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.screen = game.screen
         self.settings = game.settings
-        self.color = "Red"
+        self.color = "White"
         self.rect = pygame.Rect(0,0,10,30)
         self.y_acceleration = 0
         self.falling = True

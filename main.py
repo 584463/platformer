@@ -12,6 +12,7 @@ class Game:
         self._load_level()
         self.player = Player(self)
         self.running = True
+        self.clock = pygame.time.Clock ()
         
 
     def run(self):
@@ -47,13 +48,14 @@ class Game:
             self.player.update()
             self._check_collisions()
             self.scroll()
-
+ 
 
             #Draw Screen
             self.screen.fill(self.settings.bg_color)
             self.map.draw()
             self.player.draw()
             pygame.display.flip()
+            self.clock.tick(60)
 
     def _load_level(self):
         self.map.load_level(1, self)
@@ -78,19 +80,21 @@ class Game:
 
 
     def scroll(self):
-        self.left_limit = 0
+        self.left_limit = 0 
         if (self.player.rect.x >= self.screen.get_rect().right - self.settings.scroll_offset)\
         and self.player.moving_right:
             self.player.rect.x -= self.settings.player_speed
             for object in self.map.map_objects:
                 object.rect.x -= self.settings.player_speed
+            self.left_limit  -= self.settings.player_speed
         elif (self.player.rect.x <= self.screen.get_rect().left + self.settings.scroll_offset)\
-        and self.player.moving_left and self.player.rect.x > self.left_limit:
+        and self.player.moving_left and self.player.rect.x < self.left_limit:
             self.player.rect.x += self.settings.player_speed
             for object in self.map.map_objects:
                 object.rect.x += self.settings.player_speed
+            self.left_limit  += self.settings.player_speed
 
-        
+
 
 game = Game()
 game.run()
