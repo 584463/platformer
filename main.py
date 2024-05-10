@@ -2,7 +2,7 @@ import pygame
 from settings import Settings
 from map import Map
 from player import Player
-
+import time 
 class Game:
     def __init__(self):
         self.clock = pygame.time.Clock()
@@ -47,6 +47,7 @@ class Game:
             self.player.update()
             self._check_collisions()
             self.scroll()
+            self._check_dead()
 
 
             #Draw Screen
@@ -85,6 +86,12 @@ class Game:
             for object in self.map.map_objects:
                 object.rect.x -= self.settings.player_speed
             
+    def _check_dead(self):
+        if self.player.rect.y > self.screen.get_rect().bottom + 100:
+            
+            self.player.respawn()
+            self.map.load_level(1, self) 
+            time.sleep(0.5)
 
 game = Game()
-game.run()
+game.run() 
