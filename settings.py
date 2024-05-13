@@ -4,3 +4,5 @@ class Settings:
         self.player_speed = 10 
 
         self.scroll_offset = 600
+
+        self.player_width = 10

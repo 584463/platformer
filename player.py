@@ -10,21 +10,25 @@ class Player(pygame.sprite.Sprite):
         self.screen = game.screen
         self.settings = game.settings
         self.color = "White"
-        self.rect = pygame.Rect(0,0,10,30)
+        self.rect = pygame.Rect(0,0,self.settings.player_width,30)
+        self.rect.topleft = (0, 500)
         self.y_acceleration = 0
         self.falling = True
         self.moving_left = self.moving_right = False
         self.jump_count = 0
+        self.speed = self.settings.player_speed
     
     def draw(self):
         pygame.draw.rect(self.screen, self.color, self.rect)
         #Change to blit if you want to use an image
 
-    def update(self):
+    def update(self, map):
         
-        self.rect.y += self.y_acceleration * 1
-        if self.falling: 
+        if self.falling:
+            self.rect.y += self.y_acceleration
+
             self.y_acceleration += 1
+        self._check_collisions(map)
         
         
 
@@ -38,9 +42,9 @@ class Player(pygame.sprite.Sprite):
     def move(self, map):
 
         if self.moving_right and not self.collide("right", map.map_objects):
-            self.rect.x += self.settings.player_speed
+            self.rect.x += self.speed
         if self.moving_left and not self.collide("left", map.map_objects) and self.rect.left > 0:
-            self.rect.x -= self.settings.player_speed
+            self.rect.x -= self.speed
 
  
     def jump(self):
@@ -51,10 +55,10 @@ class Player(pygame.sprite.Sprite):
 
     def collide(self, direction, objects):
         if direction == "right":
-            vel = self.settings.player_speed
-            print(direction)
+            vel = self.speed
+
         elif direction == "left":
-            vel = -self.settings.player_speed
+            vel = -self.speed
 
         self.rect.x += vel
         
@@ -68,6 +72,24 @@ class Player(pygame.sprite.Sprite):
         
         return collided_object
     
-    def respawn(self):
+    def respawn(self, game):
         self.rect.topleft = (self.respawn_x, self.respawn_y)
         self.y_acceleration = 0
+        self.jump_count = 0
+        game.vertical_tracker = 0
+
+
+    def _check_collisions(self, map):
+        collisions = pygame.sprite.spritecollideany(self, map.map_objects)
+        print(collisions)
+        if collisions:
+            if self.y_acceleration > 0 and self.falling: #aka moving down
+                self.rect.bottom = collisions.rect.top  
+                self.landed()          
+
+            elif self.y_acceleration < 0 and self.falling: #Hit our head
+                self.rect.top = collisions.rect.bottom
+                self.y_acceleration = 0
+            
+        else:
+            self.falling = True

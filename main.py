@@ -8,12 +8,16 @@ class Game:
         self.clock = pygame.time.Clock()
         self.settings = Settings()
         self.screen = pygame.display.set_mode((1500,1000))
+        self.enemies = pygame.sprite.Group()
         pygame.display.set_caption("Platformer")
-        self.map = Map()
+        self.map = Map(self)
         self._load_level()
         self.player = Player(self)
         self.running = True
+        self.vertical_tracker = 0
+        
 
+        
     def run(self):
         while self.running:
 
@@ -44,8 +48,14 @@ class Game:
             #Update
             
             self.player.move(self.map)
-            self.player.update()
-            self._check_collisions()
+            self.player.update(self.map)
+
+
+
+            for enemy in self.enemies.sprites():
+                enemy.move(self.map)
+                enemy.update(self.map)
+                
             self.scroll()
             self._check_dead()
 
@@ -54,6 +64,8 @@ class Game:
             self.screen.fill(self.settings.bg_color)
             self.map.draw()
             self.player.draw()
+            for enemy in self.enemies.sprites():
+                enemy.draw()
             pygame.display.flip()
             self.clock.tick(60)
 
@@ -61,22 +73,7 @@ class Game:
         self.map.load_level(1, self)
 
         
-    def _check_collisions(self):
-        collisions = pygame.sprite.spritecollideany(self.player, self.map.map_objects)
-        
-        if collisions:
-            if self.player.y_acceleration > 0 and self.player.falling: #aka moving down
-                self.player.rect.bottom = collisions.rect.top  
-                self.player.landed()
 
-            elif self.player.y_acceleration < 0 and self.player.falling: #Hit our head
-                self.player.rect.top = collisions.rect.bottom
-                self.player.y_acceleration = 0
-
-
-            
-        else:
-            self.player.falling = True
 
 
     def scroll(self):
@@ -85,13 +82,28 @@ class Game:
             self.player.rect.x -=self.settings.player_speed
             for object in self.map.map_objects:
                 object.rect.x -= self.settings.player_speed
+            for enemy in self.enemies:
+                enemy.rect.x -=  self.settings.player_speed
+
+        if self.player.rect.top < self.screen.get_rect().top + self.settings.scroll_offset*2:
+            self.vertical_tracker += self.player.y_acceleration
+            if self.vertical_tracker < 0:
+                
+                self.vertical_tracker += self.player.y_acceleration
+                self.player.rect.y -= self.player.y_acceleration
+                for object in self.map.map_objects:
+                    object.rect.y -= self.player.y_acceleration
+                for enemy in self.enemies:
+                    enemy.rect.y -= self.player.y_acceleration
             
     def _check_dead(self):
         if self.player.rect.y > self.screen.get_rect().bottom + 100:
             
-            self.player.respawn()
-            self.map.load_level(1, self) 
+            self.player.respawn(self)
+            self.map.load_level(1, self)
             time.sleep(0.5)
+            
+            
 
 game = Game()
-game.run() 
+game.run()
