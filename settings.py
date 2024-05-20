@@ -6,3 +6,4 @@ class Settings:
         self.scroll_offset = 600
 
         self.player_width = 10
+        self.jump_limit = 111

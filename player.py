@@ -48,7 +48,7 @@ class Player(pygame.sprite.Sprite):
 
  
     def jump(self):
-        if self.jump_count <= 1:
+        if self.jump_count < self.settings.jump_limit:
             self.jump_count += 1
             self.y_acceleration = -20 #Testing
             self.falling = True
